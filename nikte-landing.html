@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NIKTE — Nuevo Nayarit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --verde-profundo: #0d1f0f;
+    --verde-oscuro:   #132914;
+    --verde-medio:    #1e4020;
+    --verde-suave:    #2d5e2f;
+    --verde-claro:    #4a8a4c;
+    --verde-menta:    #7ab87c;
+    --crema:          #f0ead8;
+    --crema-suave:    #e8dfc8;
+    --dorado:         #c8a96e;
+  }
+  html, body { height: 100%; background: var(--verde-profundo); color: var(--crema); font-family: 'DM Mono', monospace; overflow-x: hidden; }
+  body { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 2rem 1.5rem; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: radial-gradient(ellipse 80% 60% at 50% 0%, #1e4020 0%, transparent 70%), radial-gradient(ellipse 40% 40% at 20% 80%, #132914 0%, transparent 60%); pointer-events: none; z-index: 0; }
+  body::after { content: ''; position: fixed; inset: 0; background-image: repeating-linear-gradient(90deg, transparent, transparent 79px, rgba(74,138,76,0.06) 80px); pointer-events: none; z-index: 0; }
+  .container { position: relative; z-index: 1; width: 100%; max-width: 620px; display: flex; flex-direction: column; align-items: center; }
+  .coords { font-size: 10px; font-weight: 300; letter-spacing: 0.18em; color: var(--verde-claro); opacity: 0.7; margin-bottom: 2.5rem; animation: fadeUp 1s ease 0.2s both; }
+  .contador-wrap { display: flex; gap: clamp(0.5rem, 3vw, 1.8rem); align-items: flex-end; justify-content: center; animation: fadeUp 1s ease 0.4s both; }
+  .unidad { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .numero { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(4rem, 13vw, 8rem); line-height: 1; color: var(--crema); letter-spacing: 0.02em; min-width: 2ch; text-align: center; transition: opacity 0.1s; }
+  .numero.tick { opacity: 0.5; }
+  .unidad-label { font-size: 9px; font-weight: 300; letter-spacing: 0.24em; color: var(--verde-claro); text-transform: uppercase; }
+  .sep-puntos { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(3rem, 10vw, 6rem); color: var(--verde-suave); line-height: 1; padding-bottom: 1.4rem; animation: fadeUp 1s ease 0.4s both; user-select: none; }
+  .linea-deco { width: 1px; height: 44px; background: linear-gradient(to bottom, transparent, var(--dorado), transparent); margin: 2rem auto; animation: fadeUp 1s ease 0.6s both; }
+  .tagline { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: clamp(1.1rem, 3.5vw, 1.45rem); color: var(--crema-suave); text-align: center; line-height: 1.65; max-width: 400px; animation: fadeUp 1s ease 0.8s both; opacity: 0.9; }
+  .ubicacion { font-size: 11px; font-weight: 300; letter-spacing: 0.28em; color: var(--dorado); margin-top: 1rem; text-transform: uppercase; animation: fadeUp 1s ease 1s both; }
+  .sep { width: 48px; height: 1px; background: var(--verde-suave); margin: 2.2rem 0; animation: fadeUp 1s ease 1.1s both; }
+  .form-wrap { width: 100%; animation: fadeUp 1s ease 1.3s both; }
+  .form-intro { font-size: 11px; letter-spacing: 0.14em; color: var(--verde-menta); text-align: center; margin-bottom: 1.4rem; text-transform: uppercase; }
+  form { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+  .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  input, select { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(74,138,76,0.3); border-radius: 2px; padding: 14px 16px; font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 300; color: var(--crema); letter-spacing: 0.06em; outline: none; transition: border-color 0.3s, background 0.3s; -webkit-appearance: none; appearance: none; }
+  input::placeholder { color: rgba(240,234,216,0.3); letter-spacing: 0.08em; }
+  input:focus, select:focus { border-color: var(--dorado); background: rgba(200,169,110,0.05); }
+  select { color: rgba(240,234,216,0.5); cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%234a8a4c' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+  select.filled { color: var(--crema); }
+  select option { background: var(--verde-oscuro); color: var(--crema); }
+  button { width: 100%; padding: 16px; background: transparent; border: 1px solid var(--dorado); border-radius: 2px; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 400; letter-spacing: 0.28em; color: var(--dorado); text-transform: uppercase; cursor: pointer; transition: background 0.3s, color 0.3s, letter-spacing 0.3s; margin-top: 4px; }
+  button:hover:not(:disabled) { background: var(--dorado); color: var(--verde-profundo); letter-spacing: 0.34em; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .msg { text-align: center; font-size: 11px; letter-spacing: 0.12em; padding: 12px; border-radius: 2px; }
+  .msg.success { color: var(--verde-menta); border: 1px solid rgba(122,184,124,0.3); background: rgba(122,184,124,0.06); }
+  .msg.error { color: #e2856a; border: 1px solid rgba(226,133,106,0.3); background: rgba(226,133,106,0.06); }
+  .footer-note { margin-top: 2.5rem; font-size: 10px; letter-spacing: 0.1em; color: rgba(74,138,76,0.5); text-align: center; animation: fadeUp 1s ease 1.5s both; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+  @media (max-width: 480px) { .input-row { grid-template-columns: 1fr; } .sep-puntos { padding-bottom: 1rem; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="coords">21°03'N — 105°14'O</div>
+
+  <div class="contador-wrap">
+    <div class="unidad">
+      <div class="numero" id="horas">00</div>
+      <div class="unidad-label">horas</div>
+    </div>
+    <div class="sep-puntos">:</div>
+    <div class="unidad">
+      <div class="numero" id="minutos">00</div>
+      <div class="unidad-label">minutos</div>
+    </div>
+    <div class="sep-puntos">:</div>
+    <div class="unidad">
+      <div class="numero" id="segundos">00</div>
+      <div class="unidad-label">segundos</div>
+    </div>
+  </div>
+
+  <div class="linea-deco"></div>
+
+  <p class="tagline">Algo distinto está a punto de llegar a Nuevo Nayarit.</p>
+  <div class="ubicacion">Riviera Nayarit · México</div>
+  <div class="sep"></div>
+
+  <div class="form-wrap">
+    <p class="form-intro">Sé de los primeros en saberlo</p>
+    <form id="nikte-form">
+      <div class="input-row">
+        <input type="text" id="f-nombre" placeholder="Nombre" required autocomplete="off">
+        <input type="tel" id="f-whatsapp" placeholder="WhatsApp" required autocomplete="off">
+      </div>
+      <input type="email" id="f-email" placeholder="Correo electrónico" required autocomplete="off">
+      <select id="f-perfil" required onchange="this.classList.add('filled')">
+        <option value="" disabled selected>Soy...</option>
+        <option value="comprador">Comprador / Inversionista</option>
+        <option value="asesor">Asesor inmobiliario</option>
+        <option value="otro">Otro</option>
+      </select>
+      <button type="submit" id="btn-submit">Quiero ser el primero →</button>
+      <div class="msg success" id="msg-success" style="display:none">Registro recibido. Te contactamos pronto.</div>
+      <div class="msg error" id="msg-error" style="display:none">Algo salió mal. Intenta de nuevo.</div>
+    </form>
+  </div>
+
+  <p class="footer-note">Tu información es confidencial · Solo para acceso anticipado</p>
+</div>
+
+<script>
+  /* Contador al 19 junio 2026 00:00:00 hora México (CDT = UTC-5) */
+  const TARGET = new Date('2026-06-19T00:00:00-05:00').getTime();
+  const elH = document.getElementById('horas');
+  const elM = document.getElementById('minutos');
+  const elS = document.getElementById('segundos');
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function tick() {
+    const diff = TARGET - Date.now();
+    if (diff <= 0) { elH.textContent = elM.textContent = elS.textContent = '00'; return; }
+    const totalSeg = Math.floor(diff / 1000);
+    elS.textContent = pad(totalSeg % 60);
+    elM.textContent = pad(Math.floor(totalSeg / 60) % 60);
+    elH.textContent = pad(Math.floor(totalSeg / 3600));
+    elS.classList.add('tick');
+    setTimeout(() => elS.classList.remove('tick'), 120);
+  }
+
+  tick();
+  setInterval(tick, 1000);
+
+  /* Formulario → Google Sheet */
+  const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwtyIGBaIZmexribIt5HAEltG5Wc2nTpxZ12rwncLlrCv62JpqdlI2Z9W7ODdneFvXspQ/exec';
+  const form = document.getElementById('nikte-form');
+  const btn  = document.getElementById('btn-submit');
+  const ok   = document.getElementById('msg-success');
+  const err  = document.getElementById('msg-error');
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const nombre   = document.getElementById('f-nombre').value.trim();
+    const whatsapp = document.getElementById('f-whatsapp').value.trim();
+    const email    = document.getElementById('f-email').value.trim();
+    const perfil   = document.getElementById('f-perfil').value;
+    if (!nombre || !whatsapp || !email || !perfil) return;
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+    ok.style.display = 'none';
+    err.style.display = 'none';
+    const ref = new URLSearchParams(window.location.search).get('ref') || 'directo';
+    try {
+      await fetch(SHEET_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ timestamp: new Date().toISOString(), nombre, whatsapp, email, perfil, ref, fuente: document.referrer || 'directo' })
+      });
+      form.style.display = 'none';
+      ok.style.display = 'block';
+    } catch(e) {
+      btn.disabled = false;
+      btn.textContent = 'Quiero ser el primero →';
+      err.style.display = 'block';
+    }
+  });
+</script>
+</body>
+</html>
